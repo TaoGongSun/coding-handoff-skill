@@ -30,6 +30,14 @@ The skill directory contains `SKILL.md` and `LICENSE`. Copy or symlink the direc
 - Claude Code: use `/handoff`, or ask for a handoff.
 - Agy: use `/handoff`, or ask for a handoff.
 
+For non-interactive Agy runs, attach the repository explicitly when no Agy project is already active, for example:
+
+```sh
+agy --add-dir /absolute/path/to/repository -p "/handoff Leave a handoff for the next session."
+```
+
+Without an active or attached project, the skill asks for a repository instead of treating Agy's managed scratch directory as the project.
+
 Example:
 
 ```text

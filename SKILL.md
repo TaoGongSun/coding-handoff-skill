@@ -9,7 +9,7 @@ Leave a portable Markdown note so another coding agent can continue without a st
 
 ## Create a handoff
 
-1. Use the repository root as the project root. If there is no repository, use the current project root.
+1. Use the repository root as the project root. If there is no repository, use the current project root. The target must come from the host agent's active workspace or an explicit user path. If neither exists, ask the user to select or attach a project; do not silently write into a host-managed scratch directory.
 2. Create `.ai/handoffs/` if needed. Do not create `.ai/HANDOFF.md` or any other index, registry, database, lock, ownership record, or state file.
 3. Choose a new filename in this form:
 
