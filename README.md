@@ -1,20 +1,23 @@
 # coding-handoff-skill
 
-A minimal handoff skill for coding agents. When work must move to another session, model, or agent, it refreshes one compact Markdown file describing the grounded current state and the immediate next step.
+A minimal handoff skill for coding agents. When work must move to another session, model, or agent, it refreshes a compact Markdown snapshot for that workstream describing the grounded current state and the immediate next step.
 
 It is intentionally not a task tracker or state-management system.
 
 ## Behavior
 
-- Stores the active handoff at `<project-root>/.ai/HANDOFF.md`.
-- Rewrites the active handoff as a current-state snapshot instead of appending history.
+- Preserves the project's existing handoff convention.
+- Supports `.ai/HANDOFF.md` as either a standalone handoff or an index of independent workstreams.
+- Keeps one maintained snapshot per workstream and rewrites that file instead of appending history.
 - Removes completed, superseded, and otherwise obsolete handoff content on every refresh.
-- Consolidates and removes legacy timestamped files under `.ai/handoffs/` after the replacement has been verified.
+- Updates only the current workstream's index entry when an index exists.
+- Never bulk-deletes `.ai/handoffs/` or touches unrelated workstreams.
+- Removes an old file only when it demonstrably belongs to the same workstream and is fully superseded.
 - Allows any Markdown sections in any order.
 - Records only facts supported by the conversation or repository.
 - Points to repository files instead of copying large source files or documents.
 - Treats Git details as ordinary context, not handoff validity metadata.
-- Resumes by reading the active handoff, checking the current repository, and continuing from the immediate next step.
+- Resumes by selecting the relevant workstream from the project handoff or index, checking the current repository, and continuing from the immediate next step.
 
 It has no CLI, daemon, hook, database, ownership model, lifecycle, registry, generated index, or schema validator.
 
@@ -46,21 +49,23 @@ Example:
 $handoff Leave a handoff for the next session.
 ```
 
-To resume, name the handoff file when useful:
+To resume, name the workstream handoff when useful:
 
 ```text
-Resume from .ai/HANDOFF.md.
+Resume from .ai/handoffs/parser-review.md.
 ```
 
-If no file is named, the agent reads `.ai/HANDOFF.md`. Legacy `.ai/handoffs/*.md` files are used only as a migration fallback.
+If no file is named, the agent first determines whether `.ai/HANDOFF.md` is a standalone handoff or an index, then selects the workstream most relevant to the current conversation.
 
 ## Output
 
 ```text
 .ai/HANDOFF.md
+# or, when the project uses an index or multiple workstreams:
+.ai/handoffs/<short-topic>.md
 ```
 
-Each handoff refresh replaces obsolete information in this file. After the replacement is reread and verified, superseded legacy handoff files are removed. Multiple stable handoff files are allowed only when the user explicitly requests parallel workstreams.
+Each refresh rewrites only the selected workstream's handoff and, when needed, its own index entry. Existing unrelated handoffs are preserved. A same-workstream predecessor may be removed only after the replacement is verified and the old file is no longer referenced.
 
 ## Origin and license
 
