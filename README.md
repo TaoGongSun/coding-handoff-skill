@@ -1,18 +1,20 @@
 # coding-handoff-skill
 
-A minimal handoff skill for coding agents. When work must move to another session, model, or agent, it creates one new Markdown file describing the grounded current state and the immediate next step.
+A minimal handoff skill for coding agents. When work must move to another session, model, or agent, it refreshes one compact Markdown file describing the grounded current state and the immediate next step.
 
 It is intentionally not a task tracker or state-management system.
 
 ## Behavior
 
-- Stores handoffs under `<project-root>/.ai/handoffs/`.
-- Creates a new timestamped Markdown file every time and never overwrites an older handoff.
+- Stores the active handoff at `<project-root>/.ai/HANDOFF.md`.
+- Rewrites the active handoff as a current-state snapshot instead of appending history.
+- Removes completed, superseded, and otherwise obsolete handoff content on every refresh.
+- Consolidates and removes legacy timestamped files under `.ai/handoffs/` after the replacement has been verified.
 - Allows any Markdown sections in any order.
 - Records only facts supported by the conversation or repository.
 - Points to repository files instead of copying large source files or documents.
 - Treats Git details as ordinary context, not handoff validity metadata.
-- Resumes by reading the selected or newest relevant handoff, checking the current repository, and continuing from the immediate next step.
+- Resumes by reading the active handoff, checking the current repository, and continuing from the immediate next step.
 
 It has no CLI, daemon, hook, database, ownership model, lifecycle, registry, generated index, or schema validator.
 
@@ -44,21 +46,21 @@ Example:
 $handoff Leave a handoff for the next session.
 ```
 
-To resume, name the handoff file when possible:
+To resume, name the handoff file when useful:
 
 ```text
-Resume from .ai/handoffs/2026-08-28-0200-parser-review.md.
+Resume from .ai/HANDOFF.md.
 ```
 
-If no file is named, the agent lists `.ai/handoffs/` and selects the most relevant, then newest, document.
+If no file is named, the agent reads `.ai/HANDOFF.md`. Legacy `.ai/handoffs/*.md` files are used only as a migration fallback.
 
 ## Output
 
 ```text
-.ai/handoffs/YYYY-MM-DD-HHMM-short-topic.md
+.ai/HANDOFF.md
 ```
 
-If that filename exists, the agent uses `-2`, `-3`, and so on. Existing handoffs remain unchanged.
+Each handoff refresh replaces obsolete information in this file. After the replacement is reread and verified, superseded legacy handoff files are removed. Multiple stable handoff files are allowed only when the user explicitly requests parallel workstreams.
 
 ## Origin and license
 
